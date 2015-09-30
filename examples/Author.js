@@ -10,6 +10,7 @@ var type = thinky.type;
 module.exports = {
 
     tableName: "Author", // optional
+    connection: "connection_one",
     schema: {
         id: type.string(),
         sold: type.number(),

@@ -1,17 +1,11 @@
 # sails-hook-thinky
-A hook to enable the Thinky ORM for RethinkDB in Sails.
+A hook to enable the Thinky ORM for RethinkDB in Sails, `with multi database support.`
 
 *Using this in Production would be unwise. It has been lightly tested. Develop at your own risk.*
 
-## Installation
-
-`npm install sails-hook-thinky`
-
-or add to `package.json`
-
 ## Usage
 
-The hook configures the thinky orm and expsoses the thinky instance to the global `thinky`. All model files in the `/api/thinky` directory will be loaded automatically and exposed in the `sails.thinkymodels` propery and optionally to the global namespace. 
+The hook configures the thinky orm and expsoses the connection instance to the global `connection`. All model files in the `/api/thinky` directory will be loaded automatically and exposed in the `sails.thinkymodels` propery and optionally to the global namespace.
 
 Make model calls from any service, controller, policy, etc. just as you would normally. No need to require thinky or any model files.
 
@@ -24,11 +18,12 @@ Post.getJoin().then(function(posts) {
 ## Model file configuration
 
 ```javascript
-var type = thinky.type;
+var type = connection_one.type;
 
 module.exports = {
 
     tableName: "Car", // optional, will use name of file if not present
+    connection: "connection_one", // can be any name
     schema: {
         id: type.string(),
         type: type.string(),
@@ -40,9 +35,9 @@ module.exports = {
     // set up any relationships, indexes or function definitions here
     init: function(model) {
         model.belongsTo(Person, "owner", "idOwner", "id");
-        
+
         model.ensureIndex("type");
-        
+
         model.define("isDomestic", function() {
             return this.type === 'Ford' || this.type === 'GM';
         });
@@ -66,13 +61,20 @@ Create a new configuration file `thinky.js` in the config directory.
 
 module.exports.thinky = {
 
-  rethinkdb: {
+  connection_one: {
       host: "localhost",
       port: 28015,
       authKey: "",
       db: "test"
   },
-    
+
+  connection_two: {
+      host: "localhost",
+      port: 28015,
+      authKey: "",
+      db: "other_db"
+  },
+
 };
 ```
 
